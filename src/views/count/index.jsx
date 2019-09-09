@@ -17,14 +17,7 @@ export default class Count extends Component {
   render() {
     return (
       <div>
-        ~~~当前count值：{this.state.count}
-        <br />
-        <button
-          style={{ border: "1px dashed blue" }}
-          onClick={() => this.handleClick()}
-        >
-          增加1
-        </button>
+      <h1>11</h1>
       </div>
     );
   }

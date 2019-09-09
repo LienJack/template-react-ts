@@ -35,12 +35,6 @@ const plugins = [
     threadPool: happyThreadPool,
     verbose: true,
   }),
-  new HappyPack({
-    id: 'ts',
-    loaders: isCache ? ['cache-loader', 'babel-loader?cacheDirectory'] : ['babel-loader'],
-    threadPool: happyThreadPool,
-    verbose: true,
-  }),
   // css抽离
   new MiniCssExtractPlugin({
     filename: `css/[name].css?[hash]`,

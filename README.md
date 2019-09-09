@@ -1,4 +1,4 @@
-# react-template
+# react-ts-template
 ## 使用方法
 进入项目运行
 ```
@@ -22,10 +22,20 @@ build-test 测试环境
 build-grey 灰度测试
 build-pre 预发布
 ```
-文件目录
+## 功能
+- react 代码热更新
+- react 支持hooks
+- react-router 路由懒加载
+- Dll快速打包
+- 支持typscript
+- 支持svg组件导入
+## 文件目录
 ```
- '|-- OA_SYSTEM_WEB',
+ '|-- ,
   '    |-- .babelrc',  babel配置
+  '    |-- .eslingtrc.js',  js规范配置
+  '    |-- .tsconfig.json',  ts配置
+  '    |-- .tslint.json',  ts代码风格配置
   '    |-- .browserslistrc', CSS浏览器兼容
   '    |-- .gitignore', git忽略名单
   '    |-- customize_prompt.js', 模板自定义（用于脚手架生成时候）
@@ -50,13 +60,11 @@ build-pre 预发布
   '            |-- const.js', 公用变量
   '            |-- log.js', 打印日志
   '            |-- utils.js', 工具函数
+  '        |-- baseConfig', 公共webpack配置抽离
+  '            |-- loaders.js', loader配置
+  '            |-- plugins.js', 插件配置
 ```
 
-## 注意事项：
-- 尽量提高代码的复用性
-- 全局数据放到store里
-- 重复性的可抽离到src/components
-- 单个页面的直接在views/xxx/components
 
 ## 使用注意
 DLL使用时候可能有以下问题
@@ -68,11 +76,5 @@ DLL使用时候可能有以下问题
 
 在config/index里面配置DllConfig
 
-## BUG:  
-[x] vue热跟新会刷新页面   
-[x] DLL打包饿了么UI框架后，使用会出现问题   
-[x] 无法自动检测是否有DLL  
-[x] 代码分割失效，全部文件打包一起  
-[x] 打包后第三方UI框架资源丢失
 
 
