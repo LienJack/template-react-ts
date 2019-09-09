@@ -13,6 +13,7 @@ const { isProduction } = require('./common/const')
 const { resolvePath, getEnv } = require('./common/utils')
 const ENV = require('../config/env.js')
 const { DllConfig, isDll, isShowProgress, isCache } = require('../config/index')
+const baseConfigPlugins = require('./baseConfig/plugins')
 /**
  * css的load处理
  * @param {String} lang less，scss
@@ -78,50 +79,59 @@ const baseConfig = {
     alias: {
       '@': resolvePath('src'),
       'assets': resolvePath('src/assets'),
+      'utils': resolvePath('src/utils'),
+      'views': resolvePath('src/views')
     },
     modules: [resolvePath('node_modules')]
   },
-  plugins: [
-    // 清除之前打包的
-    new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: ['**/*'],
-    }),
-    new CopyWebpackPlugin(
-      [
-        { from: resolvePath('src/static'), to: resolvePath('dist/static')}
-      ]
-    ),
-       // 注入环境变量
-    new webpack.DefinePlugin({
-      'process.env': JSON.stringify(ENV[getEnv()])
-    }),
-    // 进度条
-    isShowProgress ?  new webpack.ProgressPlugin() :  new ProgressBarPlugin(),
-    new FriendlyErrorsWebpackPlugin(),
-    new HappyPack({
-      id: 'babel',
-      loaders: isCache ? ['cache-loader', 'babel-loader?cacheDirectory'] : ['babel-loader'],
-      threadPool: happyThreadPool,
-      verbose: true,
-    }),
-    // css抽离
-    new MiniCssExtractPlugin({
-      filename: `css/[name].css?[hash]`,
-    }),
-    new HtmlWebpackPlugin({
-      template: resolvePath('src/index.html'),
-      filename: 'index.html',
-      minify: { // 优化
-        removeAttributeQuotes: true, // 删除双引号
-        collapseWhitespace: true, // 变成一行
-        html5: true,
-        preserveLineBreaks:false,
-        minifyCSS:true,
-        minifyJS:true,
-        removeComments:false
-      },
-    }),
-  ],
+  // plugins: [
+  //   // 清除之前打包的
+  //   new CleanWebpackPlugin({
+  //     cleanOnceBeforeBuildPatterns: ['**/*'],
+  //   }),
+  //   new CopyWebpackPlugin(
+  //     [
+  //       { from: resolvePath('src/static'), to: resolvePath('dist/static')}
+  //     ]
+  //   ),
+  //      // 注入环境变量
+  //   new webpack.DefinePlugin({
+  //     'process.env': JSON.stringify(ENV[getEnv()])
+  //   }),
+  //   // 进度条
+  //   isShowProgress ?  new webpack.ProgressPlugin() :  new ProgressBarPlugin(),
+  //   new FriendlyErrorsWebpackPlugin(),
+  //   new HappyPack({
+  //     id: 'js',
+  //     loaders: isCache ? ['cache-loader', 'babel-loader?cacheDirectory'] : ['babel-loader'],
+  //     threadPool: happyThreadPool,
+  //     verbose: true,
+  //   }),
+  //   new HappyPack({
+  //     id: 'ts',
+  //     loaders: isCache ? ['cache-loader', 'babel-loader?cacheDirectory'] : ['babel-loader'],
+  //     threadPool: happyThreadPool,
+  //     verbose: true,
+  //   }),
+  //   // css抽离
+  //   new MiniCssExtractPlugin({
+  //     filename: `css/[name].css?[hash]`,
+  //   }),
+  //   new HtmlWebpackPlugin({
+  //     template: resolvePath('src/index.html'),
+  //     filename: 'index.html',
+  //     minify: { // 优化
+  //       removeAttributeQuotes: true, // 删除双引号
+  //       collapseWhitespace: true, // 变成一行
+  //       html5: true,
+  //       preserveLineBreaks:false,
+  //       minifyCSS:true,
+  //       minifyJS:true,
+  //       removeComments:false
+  //     },
+  //   }),
+  // ],
+  plugins: [...baseConfigPlugins],
   module: {
     rules: [
       {
@@ -129,34 +139,15 @@ const baseConfig = {
         loader: 'babel-loader',
         exclude: /node_modules/,
       },
-      // {
-      //   enforce: 'pre',
-      //   test: /\.(js|jsx)$/,
-      //   loader: 'eslint-loader',
-      //   exclude: /node_modules/,
-      //   options: {
-      //     formatter: require('eslint-friendly-formatter')
-      //   }
-      // },
       {
         test: /\.(ts|tsx)?$/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              transpileOnly: true,
-              compilerOptions: {
-                module: 'es2015'
-              }
-            },
-          },
-        ],
-        include: [resolvePath('src')],
+        use: 'happypack/loader?id=ts',
         exclude: /node_modules/,
+        include:[resolvePath('src')],
       },
       { 
-        test: /\.js$/,
-        use: 'happypack/loader?id=babel',
+        test: /\.(js|jsx)?$/,
+        use: 'happypack/loader?id=js',
         exclude: /node_modules/,
         include:[resolvePath('src')]
       },
@@ -191,24 +182,23 @@ const baseConfig = {
         options: {
           limit: 10000,
           name: 'font/[name]-[hash:5].[ext]',
-          publicPath: '/' // 处理文件文字引用
         }
       }
     ]
   },
 }
 // 是否开启Dll
-if (isDll) {
-  baseConfig.plugins.push(...getDllReferenceArr())
-  baseConfig.plugins.push(
-    new AddAssetHtmlPlugin({
-      filepath: resolvePath('dll/*.dll.js'), // 需要添加的第三方文件夹
-      hash: true,
-      typeOfAsset: "js",
-      outputPath:'./dll',
-      publicPath: './dll'
-    }),
-  )
-}
+// if (isDll) {
+//   baseConfig.plugins.push(...getDllReferenceArr())
+//   baseConfig.plugins.push(
+//     new AddAssetHtmlPlugin({
+//       filepath: resolvePath('dll/*.dll.js'), // 需要添加的第三方文件夹
+//       hash: true,
+//       typeOfAsset: "js",
+//       outputPath:'./dll',
+//       publicPath: './dll'
+//     }),
+//   )
+// }
 
 module.exports = baseConfig
